@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "cobblemon"
+    }
+  ],
   "type": "world_of_color:paintable",
   "ingredients": [
     [
@@ -29,4 +35,3 @@
     "id": "cobblemon:golded_chest"
   }
 }
-

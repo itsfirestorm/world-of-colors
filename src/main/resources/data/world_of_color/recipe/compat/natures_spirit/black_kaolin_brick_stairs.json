@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "natures_spirit"
+    }
+  ],
   "type": "world_of_color:paintable",
   "category": "misc",
   "ingredients": [
@@ -61,4 +67,3 @@
     "id": "natures_spirit:black_kaolin_brick_stairs"
   }
 }
-

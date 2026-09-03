@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "quark"
+    }
+  ],
   "type": "world_of_color:paintable",
   "category": "misc",
   "ingredients": [
@@ -61,4 +67,3 @@
     "id": "quark:gray_shingles_vertical_slab"
   }
 }
-

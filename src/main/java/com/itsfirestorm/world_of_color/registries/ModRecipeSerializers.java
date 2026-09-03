@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ModRecipeSerializers {
@@ -37,8 +38,8 @@ public class ModRecipeSerializers {
 
                         private final MapCodec<PaintDyesBlocks> CODEC = RecordCodecBuilder.mapCodec(instance ->
                                 instance.group(
-                                        CraftingBookCategory.CODEC.fieldOf("category")
-                                                .forGetter(r -> CraftingBookCategory.MISC),
+                                        CraftingBookCategory.CODEC.optionalFieldOf("category")
+                                                .forGetter(r -> java.util.Optional.of(CraftingBookCategory.MISC)),
                                         Codec.STRING.optionalFieldOf("group", "")
                                                 .forGetter(r -> ""),
                                         ItemStack.STRICT_CODEC.fieldOf("result")
@@ -61,7 +62,7 @@ public class ModRecipeSerializers {
                                         (category, group, result, ingredients) -> {
                                             NonNullList<Ingredient> ingredientNonNullList = NonNullList.create();
                                             ingredientNonNullList.addAll(ingredients);
-                                            return new PaintDyesBlocks(group, category, result, ingredientNonNullList);
+                                            return new PaintDyesBlocks(group, Optional.ofNullable(category), result, ingredientNonNullList);
                                         }
                                 );
 

@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "aether"
+    }
+  ],
   "type": "world_of_color:paintable",
   "category": "misc",
   "ingredients": [
@@ -22,4 +28,3 @@
     "id": "aether:red_cape"
   }
 }
-

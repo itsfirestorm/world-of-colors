@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "simulated"
+    }
+  ],
   "type": "world_of_color:paintable",
   "category": "misc",
   "ingredients": [
@@ -58,4 +64,3 @@
     "id": "simulated:black_nameplate"
   }
 }
-

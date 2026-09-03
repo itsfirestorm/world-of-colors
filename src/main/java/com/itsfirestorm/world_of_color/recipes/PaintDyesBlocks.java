@@ -12,12 +12,14 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 public class PaintDyesBlocks extends ShapelessRecipe {
 
     private final ItemStack result;
 
-    public PaintDyesBlocks(String group, CraftingBookCategory category, ItemStack result, NonNullList<Ingredient> ingredients) {
-        super(group, category, result, ingredients);
+    public PaintDyesBlocks(String group, Optional<CraftingBookCategory> category, ItemStack result, NonNullList<Ingredient> ingredients) {
+        super(group, category.orElse(CraftingBookCategory.MISC), result, ingredients);
         this.result = result;
     }
 

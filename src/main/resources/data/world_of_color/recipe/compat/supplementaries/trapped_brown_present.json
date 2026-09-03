@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "supplementaries"
+    }
+  ],
   "type": "world_of_color:paintable",
   "category": "misc",
   "ingredients": [
@@ -61,4 +67,3 @@
     "id": "supplementaries:trapped_present_brown"
   }
 }
-

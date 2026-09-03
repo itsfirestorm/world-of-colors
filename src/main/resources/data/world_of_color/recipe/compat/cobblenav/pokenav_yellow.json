@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "cobblenav"
+    }
+  ],
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
@@ -61,4 +67,3 @@
     "id": "cobblenav:pokenav_item_yellow"
   }
 }
-

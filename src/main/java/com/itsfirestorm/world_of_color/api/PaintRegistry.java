@@ -3,6 +3,7 @@ package com.itsfirestorm.world_of_color.api;
 import com.itsfirestorm.world_of_color.fluids.PaintFluidType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidType;
 
@@ -26,7 +27,7 @@ public interface PaintRegistry {
 
     void registerRecolorFamily(Map<net.minecraft.world.item.DyeColor, Item> sparseFamily);
 
-    boolean isPaintable(ItemStack stack);
+    boolean isPaintable(Level level, ItemStack stack);
 
-    Optional<ItemStack> recolor(ItemStack stack, PaintColor color);
+    Optional<ItemStack> recolor(Level level, ItemStack stack, PaintColor color);
 }

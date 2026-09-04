@@ -73,8 +73,8 @@ public class BasinDyeEventHandler {
                 return;
             }
 
-            if(PaintColorMapper.isRecolorable(heldStack) || PaintColorMapperModded.isRecolorable(heldStack)) {
-                var recolored = WorldOfColorsAPI.registry().recolor(heldStack, paintColor);
+            if(WorldOfColorsAPI.registry().isPaintable(level, heldStack)) {
+                var recolored = WorldOfColorsAPI.registry().recolor(level, heldStack, paintColor);
 
                 if (recolored.isEmpty()) {
                     event.setCanceled(true);

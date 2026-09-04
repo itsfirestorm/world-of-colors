@@ -16,17 +16,6 @@ import java.util.Set;
 public class PaintColorMapperModded {
     private static final Map<Item, Item[]> COLOR_FAMILIES = new HashMap<>();
 
-    static {
-        registerDyedBlockList(AllBlocks.SEATS);
-        registerDyedBlockList(AllBlocks.TOOLBOXES);
-        registerDyedBlockList(AllBlocks.TABLE_CLOTHS);
-        registerDyedBlockList(AllBlocks.PACKAGE_POSTBOXES);
-        registerDyedBlockList(AllBlocks.DYED_VALVE_HANDLES);
-
-        Item[] valveFamily = COLOR_FAMILIES.get(AllBlocks.DYED_VALVE_HANDLES.get(DyeColor.WHITE).asItem());
-        COLOR_FAMILIES.put(AllBlocks.COPPER_VALVE_HANDLE.asItem(), valveFamily);
-    }
-
     public static void registerFamily(Item... items) {
         if (items.length != 16) {
             throw new IllegalArgumentException(
@@ -42,16 +31,6 @@ public class PaintColorMapperModded {
         family.forEach((dye, item) -> array[dye.getId()] = item);
         for (Item item : array) {
             if (item != null) COLOR_FAMILIES.put(item, array);
-        }
-    }
-
-    public static void registerDyedBlockList(DyedBlockList<?> dyedBlockList) {
-        Item[] family = new Item[16];
-        for (DyeColor color : DyeColor.values()) {
-            family[color.getId()] = dyedBlockList.get(color).asItem();
-        }
-        for (Item item : family) {
-            if (item != null) COLOR_FAMILIES.put(item, family);
         }
     }
 

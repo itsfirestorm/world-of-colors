@@ -1,9 +1,8 @@
 package com.itsfirestorm.world_of_color.recipes;
 
+import com.itsfirestorm.world_of_color.api.PaintColor;
 import com.itsfirestorm.world_of_color.items.Paint;
 import com.itsfirestorm.world_of_color.registries.ModRecipeSerializers;
-import com.itsfirestorm.world_of_color.util.PaintColorMapper;
-import com.itsfirestorm.world_of_color.util.PaintColorMapperModded;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
@@ -11,6 +10,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -25,49 +25,26 @@ public class PaintDyesBlocks extends ShapelessRecipe {
 
     @Override
     public boolean matches(@NotNull CraftingInput input, @NotNull Level level) {
-        ItemStack targetStack = ItemStack.EMPTY;
-        boolean hasPaint = false;
-
-        for (int i = 0; i < input.size(); i++) {
-            ItemStack stack = input.getItem(i);
-            if (stack.isEmpty()) continue;
-
-            if (stack.getItem() instanceof Paint) {
-                hasPaint = true;
-            } else if (PaintColorMapper.isRecolorable(stack) || PaintColorMapperModded.isRecolorable(stack)) {
-                if (!targetStack.isEmpty()) return false;
-                targetStack = stack;
-            } else {
-                return false;
-            }
-        }
-        return !targetStack.isEmpty() && hasPaint;
+        return super.matches(input, level);
     }
 
     @Override
     public @NotNull ItemStack assemble(@NotNull CraftingInput input, HolderLookup.@NotNull Provider provider) {
         ItemStack targetStack = ItemStack.EMPTY;
-        ItemStack paintStack = ItemStack.EMPTY;
 
         for (int i = 0; i < input.size(); i++) {
             ItemStack stack = input.getItem(i);
             if (stack.isEmpty()) continue;
-            if (stack.getItem() instanceof Paint) paintStack = stack;
-            else if (PaintColorMapper.isRecolorable(stack) || PaintColorMapperModded.isRecolorable(stack))
+            if (!(stack.getItem() instanceof Paint)) {
                 targetStack = stack;
+            }
         }
 
-        if (targetStack.isEmpty() || paintStack.isEmpty()) return ItemStack.EMPTY;
+        if (targetStack.isEmpty()) return ItemStack.EMPTY;
 
-        Paint paintItem = (Paint) paintStack.getItem();
-        if (paintItem.getColor() != null) {
-            ItemStack finalTargetStack = targetStack;
-            var recolored = PaintColorMapper.recolor(finalTargetStack, paintItem.getColor())
-                    .or(() -> PaintColorMapperModded.recolor(finalTargetStack, paintItem.getColor()));
-            if (recolored.isPresent() && recolored.get().getItem() == finalTargetStack.getItem()) return ItemStack.EMPTY;
-            else if (recolored.isPresent()) return recolored.get();
-        }
-        return ItemStack.EMPTY;
+        ItemStack resultStack = result.copyWithCount(1);
+        resultStack.applyComponentsAndValidate(targetStack.getComponentsPatch());
+        return resultStack;
     }
 
     @Override
@@ -94,5 +71,25 @@ public class PaintDyesBlocks extends ShapelessRecipe {
 
     public ItemStack getResult() {
         return result;
+    }
+
+    public boolean canApply(ItemStack target, @Nullable PaintColor color) {
+        boolean matchesTarget = false;
+        boolean matchesPaint = (color == null);
+
+        for (Ingredient ingredient : getIngredients()) {
+            if (!matchesTarget && ingredient.test(target)) {
+                matchesTarget = true;
+            }
+            if (!matchesPaint) {
+                for (ItemStack option : ingredient.getItems()) {
+                    if (option.getItem() instanceof Paint p && p.getColor() == color) {
+                        matchesPaint = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return matchesTarget && matchesPaint;
     }
 }

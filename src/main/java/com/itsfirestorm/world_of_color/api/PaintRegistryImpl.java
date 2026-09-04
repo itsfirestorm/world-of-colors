@@ -1,12 +1,16 @@
 package com.itsfirestorm.world_of_color.api;
 
 import com.itsfirestorm.world_of_color.fluids.PaintFluidType;
+import com.itsfirestorm.world_of_color.recipes.PaintDyesBlocks;
 import com.itsfirestorm.world_of_color.registries.ModFluids;
 import com.itsfirestorm.world_of_color.registries.ModItems;
 import com.itsfirestorm.world_of_color.util.PaintColorMapper;
 import com.itsfirestorm.world_of_color.util.PaintColorMapperModded;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -91,15 +95,35 @@ public class PaintRegistryImpl implements PaintRegistry {
     }
 
     @Override
-    public boolean isPaintable(ItemStack stack) {
-        return PaintColorMapper.isRecolorable(stack) || PaintColorMapperModded.isRecolorable(stack);
+    public boolean isPaintable(Level level, ItemStack stack) {
+        if (PaintColorMapper.isRecolorable(stack) || PaintColorMapperModded.isRecolorable(stack)) {
+            return true;
+        }
+        return findMatchingRecipe(level, stack, null).isPresent();
     }
 
     @Override
-    public Optional<ItemStack> recolor(ItemStack stack, PaintColor color) {
-        Optional<ItemStack> result = PaintColorMapperModded.recolor(stack, color)
+    public Optional<ItemStack> recolor(Level level, ItemStack stack, PaintColor color) {
+        Optional<ItemStack> mapped = PaintColorMapperModded.recolor(stack, color)
                 .or(() -> PaintColorMapper.recolor(stack, color));
-        if (result.isPresent() && result.get().getItem() == stack.getItem()) return Optional.empty();
-        return result;
+        if (mapped.isPresent()) {
+            return mapped.get().getItem() == stack.getItem() ? Optional.empty() : mapped;
+        }
+        return findMatchingRecipe(level, stack, color).map(recipe -> {
+                ItemStack result = recipe.getResult().copyWithCount(1);
+                result.applyComponentsAndValidate(stack.getComponentsPatch());
+                return result;
+        });
+    }
+
+    private Optional<PaintDyesBlocks> findMatchingRecipe(Level level, ItemStack stack, PaintColor color) {
+        return level.getRecipeManager()
+                .getAllRecipesFor(RecipeType.CRAFTING)
+                .stream()
+                .map(RecipeHolder::value)
+                .filter(r -> r instanceof PaintDyesBlocks)
+                .map(r -> (PaintDyesBlocks) r)
+                .filter(r -> r.canApply(stack, color))
+                .findFirst();
     }
 }

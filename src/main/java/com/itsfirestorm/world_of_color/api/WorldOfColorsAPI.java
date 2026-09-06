@@ -1,5 +1,8 @@
 package com.itsfirestorm.world_of_color.api;
 
+import com.itsfirestorm.world_of_color.fluids.PaintFluidType;
+import net.minecraft.world.item.ItemStack;
+
 public final class WorldOfColorsAPI {
     public static final String MODID = "world_of_color";
     public static final String VERSION = "1.0.0";
@@ -23,5 +26,13 @@ public final class WorldOfColorsAPI {
             throw new IllegalStateException("world_of_color API already initialized.");
         }
         registry = impl;
+
+        BottleFillRegistry.register(
+                stack -> stack.getFluidType() instanceof PaintFluidType,
+                stack -> WorldOfColorsAPI.registry()
+                        .getPaintItem(((PaintFluidType) stack.getFluidType()).getPaintColor())
+                        .map(ItemStack::new)
+                        .orElse(ItemStack.EMPTY)
+        );
     }
 }

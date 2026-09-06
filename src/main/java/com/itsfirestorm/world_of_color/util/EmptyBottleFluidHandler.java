@@ -1,11 +1,7 @@
 package com.itsfirestorm.world_of_color.util;
 
-import com.itsfirestorm.world_of_color.api.PaintColor;
-import com.itsfirestorm.world_of_color.api.WorldOfColorsAPI;
-import com.itsfirestorm.world_of_color.fluids.PaintFluidType;
-import net.minecraft.world.item.Item;
+import com.itsfirestorm.world_of_color.api.BottleFillRegistry;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
@@ -41,37 +37,24 @@ public class EmptyBottleFluidHandler implements IFluidHandlerItem {
     @Override
     public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
         // Only accept paint fluids
-        return stack.getFluidType() instanceof PaintFluidType;
+        return BottleFillRegistry.matches(stack);
     }
 
     @Override
     public int fill(FluidStack resource, FluidAction action) {
         // This is called when the bottle extracts fluid FROM a container
-        if (resource.isEmpty()) {
+        if (resource.isEmpty() || !isFluidValid(0, resource)) {
             return 0;
         }
+
         int fillAmount = Math.min(CAPACITY, resource.getAmount());
+        if (fillAmount < CAPACITY) return 0;
 
-        if (action.execute() && fillAmount == CAPACITY) { // Only fill if you can fill completely
-            if ((resource.getFluidType() instanceof PaintFluidType paintFluidType)) {
-                // Get the paint color from the fluid type
-                ItemStack paintItem = getPaintItem(paintFluidType);
-
-                // Transform the container
-                container = paintItem.copy();
-            }
+        if (action.execute()) { // Only fill if you can fill completely
+            BottleFillRegistry.convert(resource).ifPresent(item -> container = item.copy());
         }
 
         return fillAmount;
-    }
-
-    private static @NotNull ItemStack getPaintItem(PaintFluidType paintFluidType) {
-        PaintColor color = paintFluidType.getPaintColor();
-
-        // Transform the empty bottle into the corresponding paint item
-        return WorldOfColorsAPI.registry().getPaintItem(color)
-                .map(ItemStack::new)
-                .orElse(ItemStack.EMPTY);
     }
 
     @Override

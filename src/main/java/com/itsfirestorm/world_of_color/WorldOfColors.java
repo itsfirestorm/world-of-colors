@@ -16,6 +16,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
@@ -121,7 +122,7 @@ public class WorldOfColors {
         );
 
         event.registerItem(
-                Capabilities.FluidHandler.ITEM,
+            Capabilities.FluidHandler.ITEM,
                 (stack, context) -> new EmptyBottleFluidHandler(stack),
                 Items.GLASS_BOTTLE
         );

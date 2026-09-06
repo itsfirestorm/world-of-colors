@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.Objects;
@@ -38,6 +39,14 @@ public class BasinDyeEventHandler {
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (!(blockEntity instanceof BasinBlockEntity)) return;
+
+        if (heldStack.getCapability(Capabilities.FluidHandler.ITEM) != null) {
+            boolean handled = FluidUtil.interactWithFluidHandler(
+                    player, InteractionHand.MAIN_HAND, level, pos, event.getFace());
+            event.setCanceled(true);
+            event.setCancellationResult(handled ? InteractionResult.SUCCESS : InteractionResult.PASS);
+            return;
+        }
 
         var fluidHandler = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null);
         if (fluidHandler == null) return;

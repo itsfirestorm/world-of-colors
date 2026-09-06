@@ -10,11 +10,13 @@ import com.itsfirestorm.world_of_color.registries.ModTriggers;
 import com.itsfirestorm.world_of_color.registries.ModClientSetup;
 import com.itsfirestorm.world_of_color.registries.ModCreativeModeTabs;
 import com.itsfirestorm.world_of_color.registries.ModItems;
+import com.itsfirestorm.world_of_color.util.EmptyBottleFluidHandler;
 import com.itsfirestorm.world_of_color.util.FluidItemHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -116,6 +118,12 @@ public class WorldOfColors {
                     return null;
                 },
                 WorldOfColorsAPI.registry().allPaintItems().values().toArray(Item[]::new)
+        );
+
+        event.registerItem(
+                Capabilities.FluidHandler.ITEM,
+                (stack, context) -> new EmptyBottleFluidHandler(stack),
+                Items.GLASS_BOTTLE
         );
     }
 

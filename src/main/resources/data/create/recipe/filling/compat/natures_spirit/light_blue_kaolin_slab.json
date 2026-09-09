@@ -3,52 +3,52 @@
   "ingredients": [
     [
       {
-        "item": "natures_spirit:kaolin_slab_slab"
+        "item": "natures_spirit:kaolin_slab"
       },
       {
-        "item": "natures_spirit:blue_kaolin_slab_slab"
+        "item": "natures_spirit:blue_kaolin_slab"
       },
       {
-        "item": "natures_spirit:brown_kaolin_slab_slab"
+        "item": "natures_spirit:brown_kaolin_slab"
       },
       {
-        "item": "natures_spirit:cyan_kaolin_slab_slab"
+        "item": "natures_spirit:cyan_kaolin_slab"
       },
       {
-        "item": "natures_spirit:gray_kaolin_slab_slab"
+        "item": "natures_spirit:gray_kaolin_slab"
       },
       {
-        "item": "natures_spirit:green_kaolin_slab_slab"
+        "item": "natures_spirit:green_kaolin_slab"
       },
       {
-        "item": "natures_spirit:black_kaolin_slab_slab"
+        "item": "natures_spirit:black_kaolin_slab"
       },
       {
-        "item": "natures_spirit:light_gray_kaolin_slab_slab"
+        "item": "natures_spirit:light_gray_kaolin_slab"
       },
       {
-        "item": "natures_spirit:lime_kaolin_slab_slab"
+        "item": "natures_spirit:lime_kaolin_slab"
       },
       {
-        "item": "natures_spirit:magenta_kaolin_slab_slab"
+        "item": "natures_spirit:magenta_kaolin_slab"
       },
       {
-        "item": "natures_spirit:orange_kaolin_slab_slab"
+        "item": "natures_spirit:orange_kaolin_slab"
       },
       {
-        "item": "natures_spirit:pink_kaolin_slab_slab"
+        "item": "natures_spirit:pink_kaolin_slab"
       },
       {
-        "item": "natures_spirit:purple_kaolin_slab_slab"
+        "item": "natures_spirit:purple_kaolin_slab"
       },
       {
-        "item": "natures_spirit:red_kaolin_slab_slab"
+        "item": "natures_spirit:red_kaolin_slab"
       },
       {
-        "item": "natures_spirit:yellow_kaolin_slab_slab"
+        "item": "natures_spirit:yellow_kaolin_slab"
       },
       {
-        "item": "natures_spirit:white_kaolin_slab_slab"
+        "item": "natures_spirit:white_kaolin_slab"
       }
     ],
     {
@@ -59,7 +59,7 @@
   ],
   "results": [
     {
-      "id": "natures_spirit:light_blue_kaolin_slab_slab"
+      "id": "natures_spirit:light_blue_kaolin_slab"
     }
   ]
 }

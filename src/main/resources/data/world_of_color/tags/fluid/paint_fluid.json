@@ -1,20 +1,20 @@
 {
   "values": [
-    "create_encapsulated:red_paint",
-    "create_encapsulated:blue_paint",
-    "create_encapsulated:yellow_paint",
-    "create_encapsulated:green_paint",
-    "create_encapsulated:pink_paint",
-    "create_encapsulated:black_paint",
-    "create_encapsulated:white_paint",
-    "create_encapsulated:purple_paint",
-    "create_encapsulated:cyan_paint",
-    "create_encapsulated:light_blue_paint",
-    "create_encapsulated:light_gray_paint",
-    "create_encapsulated:lime_paint",
-    "create_encapsulated:gray_paint",
-    "create_encapsulated:brown_paint",
-    "create_encapsulated:magenta_paint",
-    "create_encapsulated:orange_paint"
+    "world_of_color:red_paint",
+    "world_of_color:blue_paint",
+    "world_of_color:yellow_paint",
+    "world_of_color:green_paint",
+    "world_of_color:pink_paint",
+    "world_of_color:black_paint",
+    "world_of_color:white_paint",
+    "world_of_color:purple_paint",
+    "world_of_color:cyan_paint",
+    "world_of_color:light_blue_paint",
+    "world_of_color:light_gray_paint",
+    "world_of_color:lime_paint",
+    "world_of_color:gray_paint",
+    "world_of_color:brown_paint",
+    "world_of_color:magenta_paint",
+    "world_of_color:orange_paint"
   ]
 }

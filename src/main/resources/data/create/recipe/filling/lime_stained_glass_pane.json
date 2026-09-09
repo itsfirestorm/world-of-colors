@@ -7,12 +7,12 @@
     {
       "type": "neoforge:single",
       "amount": 25,
-      "fluid": "world_of_color:lime_gray_paint"
+      "fluid": "world_of_color:lime_paint"
     }
   ],
   "results": [
     {
-      "id": "minecraft:lime_gray_stained_glass_pane"
+      "id": "minecraft:lime_stained_glass_pane"
     }
   ]
 }

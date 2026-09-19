@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class EmptyBottleFluidHandler implements IFluidHandlerItem {
     private ItemStack container;
-    private static final int CAPACITY = 250; // 250mb = 1/4 bucket
 
     public EmptyBottleFluidHandler(ItemStack container) {
         this.container = container;
@@ -31,7 +30,7 @@ public class EmptyBottleFluidHandler implements IFluidHandlerItem {
 
     @Override
     public int getTankCapacity(int tank) {
-        return CAPACITY;
+        return BottleFillRegistry.maxAmount();
     }
 
     @Override
@@ -47,11 +46,14 @@ public class EmptyBottleFluidHandler implements IFluidHandlerItem {
             return 0;
         }
 
-        int fillAmount = Math.min(CAPACITY, resource.getAmount());
-        if (fillAmount < CAPACITY) return 0;
+        int requiredAmount = BottleFillRegistry.getAmount(resource).orElse(BottleFillRegistry.DEFAULT_AMOUNT);
+        int fillAmount = Math.min(requiredAmount, resource.getAmount());
+        if (fillAmount < requiredAmount) return 0;
 
-        if (action.execute()) { // Only fill if you can fill completely
-            BottleFillRegistry.convert(resource).ifPresent(item -> container = item.copy());
+        if (action.execute()) {
+            FluidStack consumed = resource.copy();
+            consumed.setAmount(fillAmount);
+            BottleFillRegistry.convert(consumed).ifPresent(item -> container = item.copy());
         }
 
         return fillAmount;

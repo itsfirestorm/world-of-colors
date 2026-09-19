@@ -46,11 +46,7 @@ public class WorldOfColors {
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public WorldOfColors(IEventBus modEventBus, ModContainer modContainer) {
-        // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
-
         modEventBus.register(Config.class);
-
         modEventBus.addListener(this::registerCapabilities);
 
         // Register ourselves for server and other game events we are interested in.
@@ -92,17 +88,6 @@ public class WorldOfColors {
 
         // Register API
         WorldOfColorsAPI.internalInit(new PaintRegistryImpl());
-    }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (Config.logDirtBlock) LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-
-        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
-
-        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {

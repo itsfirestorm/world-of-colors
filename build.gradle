@@ -18,6 +18,7 @@ repositories {
 
     maven { url = "https://maven.createmod.net" }
     maven { url = "https://maven.ithundxr.dev/snapshots" } // Registrate
+    maven { url = "https://maven.blamejared.com" }
 }
 
 dependencies {
@@ -25,6 +26,7 @@ dependencies {
     implementation "net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}"
     compileOnly "dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}"
     runtimeOnly "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
+    compileOnly("mezz.jei:jei-1.21.1-neoforge:19.44.0.403")
     implementation "com.tterrag.registrate:Registrate:${registrate_version}"
 }
 

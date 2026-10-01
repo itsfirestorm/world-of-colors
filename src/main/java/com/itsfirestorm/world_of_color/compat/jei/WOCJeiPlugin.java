@@ -46,7 +46,13 @@ public class WOCJeiPlugin implements IModPlugin {
     public static final RecipeType<RecipeHolder<FillingRecipe>> SPOUT_FILLING =
             RecipeType.createRecipeHolderType(ResourceLocation.fromNamespaceAndPath("create", "spout_filling"));
 
-    public record BasinInteraction(ItemStack target, FluidStack fluid, ItemStack result) {};
+    public record BasinInteraction(List<ItemStack> targets, FluidStack fluid, List<ItemStack> results) {
+        public BasinInteraction {
+            if (targets.size() != results.size() || targets.isEmpty()) {
+                throw new IllegalArgumentException("Targets and results must be the same non-zero size!");
+            }
+        }
+    }
 
     public static final RecipeType<BasinInteraction> BASIN =
             RecipeType.create(WorldOfColorsAPI.MODID, "basin", BasinInteraction.class);
@@ -102,30 +108,40 @@ public class WOCJeiPlugin implements IModPlugin {
         if (level == null) return;
 
         var registry = WorldOfColorsAPI.registry();
-        List<BasinInteraction> displays = new ArrayList<>();
+        List<ItemStack> paintables = new ArrayList<>();
 
         for (Item item : BuiltInRegistries.ITEM) {
             ItemStack stack = item.getDefaultInstance();
             if (stack.isEmpty()) continue;
+            if (PaintHelper.isDyeableArmor(stack) || registry.isPaintable(level, stack)) {
+                paintables.add(stack);
+            }
+        }
 
-            boolean armor = PaintHelper.isDyeableArmor(stack);
-            if (!armor && !registry.isPaintable(level, stack)) continue;
+        List<BasinInteraction> displays = new ArrayList<>();
 
-            for (PaintColor color : PaintColor.values()) {
-                var fluidSupplier = registry.getPaintFluid(color);
-                if (fluidSupplier.isEmpty()) continue;
-                FluidStack fluid = new FluidStack(fluidSupplier.get().get(), 50);
+        for (PaintColor color : PaintColor.values()) {
+            var fluidSupplier = registry.getPaintFluid(color);
+            if (fluidSupplier.isEmpty()) continue;
+            FluidStack fluid = new FluidStack(fluidSupplier.get().get(), 1000);
 
+            List<ItemStack> targets = new ArrayList<>();
+            List<ItemStack> results = new ArrayList<>();
+
+            for (ItemStack stack : paintables) {
                 ItemStack result;
-                if (armor) {
+                if (PaintHelper.isDyeableArmor(stack)) {
                     result = stack.copy();
                     result.set(DataComponents.DYED_COLOR, new DyedItemColor(color.getColor(), true));
                 } else {
                     result = registry.recolor(level, stack, color).orElse(ItemStack.EMPTY);
-                    if (result.isEmpty() || result.getItem() == item) continue;
+                    if (result.isEmpty() || result.getItem() == stack.getItem()) continue;
                 }
-
-                displays.add(new BasinInteraction(stack, fluid, result));
+                targets.add(stack);
+                results.add(result);
+            }
+            if (!targets.isEmpty()) {
+                displays.add(new BasinInteraction(targets, fluid, results));
             }
         }
 

@@ -4,12 +4,16 @@ import com.itsfirestorm.world_of_color.recipes.PaintDyesBlocks;
 import com.simibubi.create.AllBlocks;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.ingredient.IRecipeSlotView;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.AbstractRecipeCategory;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 public class BasinInteractionCategory extends AbstractRecipeCategory<WOCJeiPlugin.BasinInteraction> {
     private BasinDyeDrawable animation = new BasinDyeDrawable();
@@ -29,22 +33,33 @@ public class BasinInteractionCategory extends AbstractRecipeCategory<WOCJeiPlugi
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, WOCJeiPlugin.BasinInteraction recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 4 ,8)
+        var target = builder.addSlot(RecipeIngredientRole.INPUT, 4 ,8)
+                .setSlotName("target")
                 .setStandardSlotBackground()
-                .addItemStack(recipe.target());
+                .addItemStacks(recipe.targets());
 
         builder.addSlot(RecipeIngredientRole.INPUT, 4, 42)
                 .setStandardSlotBackground()
                 .addFluidStack(recipe.fluid().getFluid(), recipe.fluid().getAmount());
 
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 118, 26)
+        var result = builder.addSlot(RecipeIngredientRole.OUTPUT, 118, 26)
+                .setSlotName("result")
                 .setStandardSlotBackground()
-                .addItemStack(recipe.result());
+                .addItemStacks(recipe.results());
+
+        builder.createFocusLink(target, result);
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, WOCJeiPlugin.BasinInteraction recipe, IFocusGroup focuses) {
-        animation.setDisplay(recipe);
-        builder.addDrawable(animation, 30, 0);
+    public void draw(WOCJeiPlugin.BasinInteraction recipe, IRecipeSlotsView slots, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        ItemStack target = slots.findSlotByName("target")
+                .flatMap(IRecipeSlotView::getDisplayedItemStack)
+                .orElse(recipe.targets().get(0));
+
+        ItemStack result = slots.findSlotByName("result")
+                .flatMap(IRecipeSlotView::getDisplayedItemStack)
+                .orElse(recipe.results().get(0));
+
+        BasinDyeDrawable.draw(guiGraphics, 30, 0, target, recipe.fluid(), result);
     }
 }

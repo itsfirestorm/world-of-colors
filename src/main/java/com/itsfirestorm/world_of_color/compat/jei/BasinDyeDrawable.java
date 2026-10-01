@@ -2,7 +2,6 @@ package com.itsfirestorm.world_of_color.compat.jei;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.simibubi.create.AllBlocks;
-import mezz.jei.api.gui.drawable.IDrawable;
 import net.createmod.catnip.gui.element.GuiGameElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,26 +12,17 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-public class BasinDyeDrawable implements IDrawable {
+public final class BasinDyeDrawable {
 
     private static final int W = 80, H = 79;
     private static final int CYCLE_MS = 3200;
 
-    private static final int FLUID_X = 22, FLUID_Y = 4, FLUID_W = 44, FLUID_H = 9;
+    private static final int FLUID_X = 22, FLUID_Y = 4, FLUID_W = 44, FLUID_H = 44;
 
-    private WOCJeiPlugin.BasinInteraction display;
+    BasinDyeDrawable() {}
 
-    public void setDisplay(WOCJeiPlugin.BasinInteraction display) {
-        this.display = display;
-    }
-
-    @Override public int getWidth() { return 0; }
-    @Override public int getHeight() { return 0; }
-
-    @Override
-    public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset) {
-        if (display == null) return;
-
+    public static void draw(GuiGraphics guiGraphics, int xOffset, int yOffset,
+                            ItemStack target, FluidStack fluid, ItemStack result) {
         float t = (net.minecraft.Util.getMillis() % CYCLE_MS) / (float) CYCLE_MS;
 
         // Animation table
@@ -41,15 +31,15 @@ public class BasinDyeDrawable implements IDrawable {
         else if (t < 0.65f)     dip = 1f;
         else                    dip = 1f - ease((t - 0.65f) / 0.35f);
 
-        ItemStack shown = t < 0.48f ? display.target() : display.result();
+        ItemStack shown = t < 0.48f ? target : result;
 
         PoseStackHelper.run(guiGraphics, xOffset, yOffset, () -> {
             // 1. Render Basin
             guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(8, 26, 0);
+            guiGraphics.pose().translate(28, 52, 110);
             GuiGameElement.of(AllBlocks.BASIN.getDefaultState())
                     .rotateBlock(22.5, 45, 0)
-                    .scale(20)
+                    .scale(30)
                     .render(guiGraphics);
             guiGraphics.pose().popPose();
 
@@ -64,7 +54,7 @@ public class BasinDyeDrawable implements IDrawable {
             // 3. Render fluid
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0, 0, 100);
-            drawFluid(guiGraphics, display.fluid(), FLUID_X, FLUID_Y, FLUID_W, FLUID_H, 1.0f);
+            drawFluid(guiGraphics, fluid, FLUID_X, FLUID_Y, FLUID_W, FLUID_H, 1.0f);
             guiGraphics.pose().popPose();
         });
     }

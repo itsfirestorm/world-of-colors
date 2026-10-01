@@ -1,23 +1,33 @@
 package com.itsfirestorm.world_of_color.compat.jei;
 
 import com.itsfirestorm.world_of_color.api.BottleFillRegistry;
+import com.itsfirestorm.world_of_color.api.PaintColor;
+import com.itsfirestorm.world_of_color.api.PaintHelper;
 import com.itsfirestorm.world_of_color.api.WorldOfColorsAPI;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.fluids.transfer.FillingRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingOutput;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.api.recipe.RecipeType;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
@@ -35,6 +45,11 @@ public class WOCJeiPlugin implements IModPlugin {
 
     public static final RecipeType<RecipeHolder<FillingRecipe>> SPOUT_FILLING =
             RecipeType.createRecipeHolderType(ResourceLocation.fromNamespaceAndPath("create", "spout_filling"));
+
+    public record BasinInteraction(ItemStack target, FluidStack fluid, ItemStack result) {};
+
+    public static final RecipeType<BasinInteraction> BASIN =
+            RecipeType.create(WorldOfColorsAPI.MODID, "basin", BasinInteraction.class);
 
     @Override
     public ResourceLocation getPluginUid() {
@@ -78,9 +93,43 @@ public class WOCJeiPlugin implements IModPlugin {
                     BuiltInRegistries.FLUID.getKey(displayFluid.getFluid()), e);
                 }
             }
+
+        }
+        registration.addRecipes(SPOUT_FILLING, recipes);
+
+        // Basin Interaction registry
+        Level level = Minecraft.getInstance().level;
+        if (level == null) return;
+
+        var registry = WorldOfColorsAPI.registry();
+        List<BasinInteraction> displays = new ArrayList<>();
+
+        for (Item item : BuiltInRegistries.ITEM) {
+            ItemStack stack = item.getDefaultInstance();
+            if (stack.isEmpty()) continue;
+
+            boolean armor = PaintHelper.isDyeableArmor(stack);
+            if (!armor && !registry.isPaintable(level, stack)) continue;
+
+            for (PaintColor color : PaintColor.values()) {
+                var fluidSupplier = registry.getPaintFluid(color);
+                if (fluidSupplier.isEmpty()) continue;
+                FluidStack fluid = new FluidStack(fluidSupplier.get().get(), 50);
+
+                ItemStack result;
+                if (armor) {
+                    result = stack.copy();
+                    result.set(DataComponents.DYED_COLOR, new DyedItemColor(color.getColor(), true));
+                } else {
+                    result = registry.recolor(level, stack, color).orElse(ItemStack.EMPTY);
+                    if (result.isEmpty() || result.getItem() == item) continue;
+                }
+
+                displays.add(new BasinInteraction(stack, fluid, result));
+            }
         }
 
-        registration.addRecipes(SPOUT_FILLING, recipes);
+        registration.addRecipes(BASIN, displays);
     }
 
     @Override
@@ -111,5 +160,17 @@ public class WOCJeiPlugin implements IModPlugin {
         recipeManager.hideRecipes(SPOUT_FILLING, toHide);
         logger.info("Hiding {} recipes: {}", toHide.size(),
                 toHide.stream().map(RecipeHolder::id).toList());
+    }
+
+    @Override
+    public void registerCategories(IRecipeCategoryRegistration registration) {
+        registration.addRecipeCategories(
+                new BasinInteractionCategory(registration.getJeiHelpers().getGuiHelper())
+        );
+    }
+
+    @Override
+    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        registration.addRecipeCatalyst(AllBlocks.BASIN.asStack(), BASIN);
     }
 }

@@ -30,4 +30,8 @@ public interface PaintRegistry {
     boolean isPaintable(Level level, ItemStack stack);
 
     Optional<ItemStack> recolor(Level level, ItemStack stack, PaintColor color);
+
+    void excludeRecoloring(Item... items);
+
+    boolean isExcluded(ItemStack stack);
 }

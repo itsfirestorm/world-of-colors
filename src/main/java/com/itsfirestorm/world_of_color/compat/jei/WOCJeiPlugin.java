@@ -112,7 +112,7 @@ public class WOCJeiPlugin implements IModPlugin {
 
         for (Item item : BuiltInRegistries.ITEM) {
             ItemStack stack = item.getDefaultInstance();
-            if (stack.isEmpty()) continue;
+            if (stack.isEmpty() || registry.isExcluded(stack)) continue;
             if (PaintHelper.isDyeableArmor(stack) || registry.isPaintable(level, stack)) {
                 paintables.add(stack);
             }

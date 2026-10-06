@@ -60,11 +60,7 @@ public class BasinDyeEventHandler {
             // Try armor dyeing first, this doesn't work like crafting, it only replaces the color of the armor
             // by the color of the paint that is in the basin
             if (PaintHelper.isDyeableArmor(heldStack)) {
-                if (heldStack.has(DataComponents.DYED_COLOR) &&
-                        Objects.requireNonNull(heldStack.get(DataComponents.DYED_COLOR)).rgb() == paintColor.getColor()) {
-                    event.setCanceled(true);
-                    return;
-                }
+                if (WorldOfColorsAPI.registry().isExcluded(heldStack)) return;
                 if(!level.isClientSide) {
                     FluidStack drained = fluidHandler.drain(
                             new FluidStack(fluidInTank.getFluid(), 50),

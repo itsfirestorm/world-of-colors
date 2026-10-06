@@ -1,9 +1,11 @@
 package com.itsfirestorm.world_of_color.api;
 
 import com.itsfirestorm.world_of_color.fluids.PaintFluidType;
+import com.itsfirestorm.world_of_color.items.Paint;
 import com.itsfirestorm.world_of_color.recipes.PaintDyesBlocks;
 import com.itsfirestorm.world_of_color.registries.ModFluids;
 import com.itsfirestorm.world_of_color.registries.ModItems;
+import com.itsfirestorm.world_of_color.registries.ModTags;
 import com.itsfirestorm.world_of_color.util.PaintColorMapper;
 import com.itsfirestorm.world_of_color.util.PaintColorMapperModded;
 import net.minecraft.world.item.Item;
@@ -16,10 +18,8 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class PaintRegistryImpl implements PaintRegistry {
@@ -27,6 +27,7 @@ public class PaintRegistryImpl implements PaintRegistry {
     private final Map<PaintColor, DeferredItem<Item>> items = new EnumMap<>(PaintColor.class);
     private final Map<PaintColor, DeferredHolder<Fluid, ?>> fluids = new EnumMap<>(PaintColor.class);
     private final Map<PaintColor, DeferredHolder<FluidType, PaintFluidType>> fluidTypes = new EnumMap<>(PaintColor.class);
+    private final Set<Item> excluded = new HashSet<>();
 
     public PaintRegistryImpl() {
         for (PaintColor color : PaintColor.values()) {
@@ -85,6 +86,7 @@ public class PaintRegistryImpl implements PaintRegistry {
 
     @Override
     public boolean isPaintable(Level level, ItemStack stack) {
+        if (isExcluded(stack)) return false;
         if (PaintColorMapper.isRecolorable(stack) || PaintColorMapperModded.isRecolorable(stack)) {
             return true;
         }
@@ -93,6 +95,7 @@ public class PaintRegistryImpl implements PaintRegistry {
 
     @Override
     public Optional<ItemStack> recolor(Level level, ItemStack stack, PaintColor color) {
+        if (isExcluded(stack)) return Optional.empty();
         Optional<ItemStack> mapped = PaintColorMapperModded.recolor(stack, color)
                 .or(() -> PaintColorMapper.recolor(stack, color));
         if (mapped.isPresent()) {
@@ -102,7 +105,7 @@ public class PaintRegistryImpl implements PaintRegistry {
                 ItemStack result = recipe.getResult().copyWithCount(1);
                 result.applyComponentsAndValidate(stack.getComponentsPatch());
                 return result;
-        });
+        }).filter(result -> result.getItem() != stack.getItem());
     }
 
     private Optional<PaintDyesBlocks> findMatchingRecipe(Level level, ItemStack stack, PaintColor color) {
@@ -114,5 +117,17 @@ public class PaintRegistryImpl implements PaintRegistry {
                 .map(r -> (PaintDyesBlocks) r)
                 .filter(r -> r.canApply(stack, color))
                 .findFirst();
+    }
+
+    @Override
+    public void excludeRecoloring(Item... items) {
+        excluded.addAll(Arrays.asList(items));
+    }
+
+    @Override
+    public boolean isExcluded(ItemStack stack) {
+        return stack.getItem() instanceof Paint
+                || excluded.contains(stack.getItem())
+                || stack.is(ModTags.UNPAINTABLE);
     }
 }

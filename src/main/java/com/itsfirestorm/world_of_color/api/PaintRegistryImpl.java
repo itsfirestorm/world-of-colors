@@ -36,17 +36,6 @@ public class PaintRegistryImpl implements PaintRegistry {
         }
     }
 
-    private void register(
-            PaintColor color,
-            DeferredItem<Item> item,
-            DeferredHolder<Fluid, ?> fluid,
-            DeferredHolder<FluidType, PaintFluidType> fluidType
-    ) {
-        items.put(color, item);
-        fluids.put(color, fluid);
-        fluidTypes.put(color, fluidType);
-    }
-
     @Override
     public Optional<Item> getPaintItem(PaintColor paintColor) {
         DeferredItem<Item> holder = items.get(paintColor);

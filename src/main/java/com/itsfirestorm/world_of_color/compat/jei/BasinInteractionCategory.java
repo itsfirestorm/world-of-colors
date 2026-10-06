@@ -1,12 +1,10 @@
 package com.itsfirestorm.world_of_color.compat.jei;
 
-import com.itsfirestorm.world_of_color.recipes.PaintDyesBlocks;
 import com.simibubi.create.AllBlocks;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -16,7 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 public class BasinInteractionCategory extends AbstractRecipeCategory<WOCJeiPlugin.BasinInteraction> {
-    private BasinDyeDrawable animation = new BasinDyeDrawable();
 
     public BasinInteractionCategory(IGuiHelper guiHelper) {
         super(
@@ -60,6 +57,6 @@ public class BasinInteractionCategory extends AbstractRecipeCategory<WOCJeiPlugi
                 .flatMap(IRecipeSlotView::getDisplayedItemStack)
                 .orElse(recipe.results().get(0));
 
-        BasinDyeDrawable.draw(guiGraphics, 30, 0, target, recipe.fluid(), result);
+        BasinDyeDrawable.draw(guiGraphics, target, recipe.fluid(), result);
     }
 }

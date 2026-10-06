@@ -36,5 +36,7 @@
   "fluid_type.world_of_color.orange_paint": "Orange Paint",
   "fluid_type.world_of_color.brown_paint": "Brown Paint",
   "fluid_type.world_of_color.light_gray_paint": "Light Gray Paint",
-  "fluid_type.world_of_color.gray_paint": "Gray Paint"
+  "fluid_type.world_of_color.gray_paint": "Gray Paint",
+
+  "jei.world_of_color.basin_interaction": "Color Dipping"
 }

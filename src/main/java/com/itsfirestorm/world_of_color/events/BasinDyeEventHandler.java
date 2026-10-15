@@ -3,7 +3,10 @@ package com.itsfirestorm.world_of_color.events;
 import com.itsfirestorm.world_of_color.api.PaintColor;
 import com.itsfirestorm.world_of_color.api.PaintHelper;
 import com.itsfirestorm.world_of_color.api.WorldOfColorsAPI;
+import com.itsfirestorm.world_of_color.items.Paint;
 import com.simibubi.create.content.processing.basin.BasinBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
+import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
@@ -18,7 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.Objects;
@@ -33,18 +35,17 @@ public class BasinDyeEventHandler {
         Player player = event.getEntity();
         ItemStack heldStack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-        if (heldStack.isEmpty()) return;
+        // Create already has a built-in function to fill basins using paints that are related to fluids.
+        if (heldStack.isEmpty() || heldStack.getItem() instanceof Paint) return;
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (!(blockEntity instanceof BasinBlockEntity)) return;
+        if (!(blockEntity instanceof BasinBlockEntity basin)) return;
 
-        if (heldStack.getCapability(Capabilities.FluidHandler.ITEM) != null) {
-            boolean handled = FluidUtil.interactWithFluidHandler(
-                    player, InteractionHand.MAIN_HAND, level, pos, event.getFace());
-            event.setCanceled(true);
-            event.setCancellationResult(handled ? InteractionResult.SUCCESS : InteractionResult.PASS);
-            return;
-        }
+        // Click check to allow the player to click the filter slot on basins.
+        FilteringBehaviour filteringBehaviour = basin.getBehaviour(FilteringBehaviour.TYPE);
+        if (filteringBehaviour.getSlotPositioning() instanceof ValueBoxTransform.Sided sided)
+            sided.fromSide(event.getFace());
+        if (filteringBehaviour.testHit(event.getHitVec().getLocation())) return;
 
         var fluidHandler = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null);
         if (fluidHandler == null) return;

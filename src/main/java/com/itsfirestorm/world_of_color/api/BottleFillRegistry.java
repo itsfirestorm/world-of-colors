@@ -54,6 +54,7 @@ public class BottleFillRegistry {
         return ENTRIES.stream().anyMatch(e -> e.matcher().test(stack));
     }
 
+    // Converts FluidStack to ItemStack
     public static Optional<ItemStack> convert(FluidStack stack) {
         return ENTRIES.stream()
                 .filter(e -> e.matcher().test(stack))

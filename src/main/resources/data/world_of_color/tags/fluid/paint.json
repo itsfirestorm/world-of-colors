@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     "world_of_color:red_paint",
     "world_of_color:blue_paint",

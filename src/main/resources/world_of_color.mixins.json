@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "com.itsfirestorm.world_of_color.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["AttributeFilterInputMixin"],
+  "injectors": { "defaultRequire": 1 }
+}

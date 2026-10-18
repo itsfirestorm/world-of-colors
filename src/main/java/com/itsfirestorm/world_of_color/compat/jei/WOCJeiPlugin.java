@@ -30,11 +30,9 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @JeiPlugin
@@ -58,16 +56,17 @@ public class WOCJeiPlugin implements IModPlugin {
             RecipeType.create(WorldOfColorsAPI.MODID, "basin", BasinInteraction.class);
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public @NotNull ResourceLocation getPluginUid() {
         return ID;
     }
 
     @Override
-    public void registerRecipes(IRecipeRegistration registration) {
+    public void registerRecipes(@NotNull IRecipeRegistration registration) {
         List<RecipeHolder<FillingRecipe>> recipes = new ArrayList<>();
         var entries = BottleFillRegistry.entries();
         var logger = org.apache.logging.log4j.LogManager.getLogger("WOCJeiPlugin");
         logger.info("BottleFillRegistry has {} entries at JEI registration time.", entries.size());
+        long paintableNs = 0, recolorNs = 0; int pc = 0, rc = 0;
 
         for (BottleFillRegistry.Entry entry : entries) {
             for (FluidStack displayFluid : entry.displayFluids().get()) {
@@ -113,9 +112,10 @@ public class WOCJeiPlugin implements IModPlugin {
         for (Item item : BuiltInRegistries.ITEM) {
             ItemStack stack = item.getDefaultInstance();
             if (stack.isEmpty() || registry.isExcluded(stack)) continue;
-            if (PaintHelper.isDyeableArmor(stack) || registry.isPaintable(level, stack)) {
-                paintables.add(stack);
-            }
+            long t = System.nanoTime();
+            boolean ok = PaintHelper.isDyeableArmor(stack) || registry.isPaintable(level, stack);
+            paintableNs += System.nanoTime() - t; pc++;
+            if (ok) paintables.add(stack);
         }
 
         List<BasinInteraction> displays = new ArrayList<>();
@@ -134,7 +134,9 @@ public class WOCJeiPlugin implements IModPlugin {
                     result = stack.copy();
                     result.set(DataComponents.DYED_COLOR, new DyedItemColor(color.getColor(), true));
                 } else {
+                    long t = System.nanoTime();
                     result = registry.recolor(level, stack, color).orElse(ItemStack.EMPTY);
+                    recolorNs += System.nanoTime() - t; rc++;
                     if (result.isEmpty() || result.getItem() == stack.getItem()) continue;
                 }
                 targets.add(stack);
@@ -144,8 +146,10 @@ public class WOCJeiPlugin implements IModPlugin {
                 displays.add(new BasinInteraction(targets, fluid, results));
             }
         }
-
+        
         registration.addRecipes(BASIN, displays);
+        logger.info("isPaintable: {} calls, {} ms | recolor: {} calls, {} ms",
+                pc, paintableNs / 1_000_000, rc, recolorNs / 1_000_000);
     }
 
     @Override

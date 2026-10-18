@@ -18,7 +18,6 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -28,6 +27,7 @@ public class PaintRegistryImpl implements PaintRegistry {
     private final Map<PaintColor, DeferredHolder<Fluid, ?>> fluids = new EnumMap<>(PaintColor.class);
     private final Map<PaintColor, DeferredHolder<FluidType, PaintFluidType>> fluidTypes = new EnumMap<>(PaintColor.class);
     private final Set<Item> excluded = new HashSet<>();
+    private volatile List<PaintDyesBlocks> cachedPaintRecipes;
 
     public PaintRegistryImpl() {
         for (PaintColor color : PaintColor.values()) {
@@ -35,6 +35,32 @@ public class PaintRegistryImpl implements PaintRegistry {
             fluids.put(color, ModFluids.getFluid(color));
             fluidTypes.put(color, ModFluids.getType(color));
         }
+    }
+
+    public void invalidateCacheRecipe() {
+        cachedPaintRecipes = null;
+    }
+
+    private List<PaintDyesBlocks> paintRecipes(Level level) {
+        List<PaintDyesBlocks> list = cachedPaintRecipes;
+        if (list == null) {
+            list = level.getRecipeManager()
+                    .getAllRecipesFor(RecipeType.CRAFTING)
+                    .stream()
+                    .map(RecipeHolder::value)
+                    .filter(PaintDyesBlocks.class::isInstance)
+                    .map(PaintDyesBlocks.class::cast)
+                    .toList();
+            cachedPaintRecipes = list;
+        }
+        return list;
+    }
+
+    private Optional<PaintDyesBlocks> findMatchingRecipe(Level level, ItemStack stack, PaintColor color) {
+        for (PaintDyesBlocks recipe : paintRecipes(level)) {
+            if (recipe.canApply(stack, color)) return Optional.of(recipe);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -106,17 +132,6 @@ public class PaintRegistryImpl implements PaintRegistry {
                 result.applyComponentsAndValidate(stack.getComponentsPatch());
                 return result;
         }).filter(result -> result.getItem() != stack.getItem());
-    }
-
-    private Optional<PaintDyesBlocks> findMatchingRecipe(Level level, ItemStack stack, PaintColor color) {
-        return level.getRecipeManager()
-                .getAllRecipesFor(RecipeType.CRAFTING)
-                .stream()
-                .map(RecipeHolder::value)
-                .filter(r -> r instanceof PaintDyesBlocks)
-                .map(r -> (PaintDyesBlocks) r)
-                .filter(r -> r.canApply(stack, color))
-                .findFirst();
     }
 
     @Override
